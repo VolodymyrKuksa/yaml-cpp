@@ -56,8 +56,9 @@ inline Node::Node(detail::node& node, detail::shared_memory_holder pMemory)
 inline Node::~Node() = default;
 
 inline void Node::EnsureNodeExists() const {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   if (!m_pNode) {
     m_pMemory.reset(new detail::memory_holder);
     m_pNode = &m_pMemory->create_node();
@@ -80,8 +81,9 @@ inline Mark Node::Mark() const {
 }
 
 inline NodeType::value Node::Type() const {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   return m_pNode ? m_pNode->type() : NodeType::Null;
 }
 
@@ -124,13 +126,16 @@ struct as_if<T, void> {
   const Node& node;
 
   T operator()() const {
-    if (!node.m_pNode)
+    if (!node.m_pNode) {
       assert(false); exit(1); // throw TypedBadConversion<T>(node.Mark());
+    }
 
     T t;
     if (convert<T>::decode(node, t))
       return t;
-    assert(false); exit(1); // throw TypedBadConversion<T>(node.Mark());
+    // throw TypedBadConversion<T>(node.Mark());
+    assert(false);
+    exit(1);
   }
 };
 
@@ -142,8 +147,9 @@ struct as_if<std::string, void> {
   std::string operator()() const {
     if (node.Type() == NodeType::Null)
       return "null";
-    if (node.Type() != NodeType::Scalar)
+    if (node.Type() != NodeType::Scalar) {
       assert(false); exit(1); // throw TypedBadConversion<std::string>(node.Mark());
+    }
     return node.Scalar();
   }
 };
@@ -151,8 +157,9 @@ struct as_if<std::string, void> {
 // access functions
 template <typename T>
 inline T Node::as() const {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   return as_if<T, void>(*this)();
 }
 
@@ -164,14 +171,16 @@ inline T Node::as(const S& fallback) const {
 }
 
 inline const std::string& Node::Scalar() const {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   return m_pNode ? m_pNode->scalar() : detail::node_data::empty_scalar();
 }
 
 inline const std::string& Node::Tag() const {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   return m_pNode ? m_pNode->tag() : detail::node_data::empty_scalar();
 }
 
@@ -181,8 +190,9 @@ inline void Node::SetTag(const std::string& tag) {
 }
 
 inline EmitterStyle::value Node::Style() const {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   return m_pNode ? m_pNode->style() : EmitterStyle::Default;
 }
 
@@ -193,8 +203,9 @@ inline void Node::SetStyle(EmitterStyle::value style) {
 
 // assignment
 inline bool Node::is(const Node& rhs) const {
-  if (!m_isValid || !rhs.m_isValid)
+  if (!m_isValid || !rhs.m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   if (!m_pNode || !rhs.m_pNode)
     return false;
   return m_pNode->is(*rhs.m_pNode);
@@ -214,16 +225,18 @@ inline Node& Node::operator=(const Node& rhs) {
 }
 
 inline void Node::reset(const YAML::Node& rhs) {
-  if (!m_isValid || !rhs.m_isValid)
+  if (!m_isValid || !rhs.m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   m_pMemory = rhs.m_pMemory;
   m_pNode = rhs.m_pNode;
 }
 
 template <typename T>
 inline void Node::Assign(const T& rhs) {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   AssignData(convert<T>::encode(rhs));
 }
 
@@ -252,8 +265,9 @@ inline void Node::AssignData(const Node& rhs) {
 }
 
 inline void Node::AssignNode(const Node& rhs) {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   rhs.EnsureNodeExists();
 
   if (!m_pNode) {
@@ -269,8 +283,9 @@ inline void Node::AssignNode(const Node& rhs) {
 
 // size/iterator
 inline std::size_t Node::size() const {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   return m_pNode ? m_pNode->size() : 0;
 }
 
@@ -302,8 +317,9 @@ inline iterator Node::end() {
 // sequence
 template <typename T>
 inline void Node::push_back(const T& rhs) {
-  if (!m_isValid)
+  if (!m_isValid) {
     assert(false); exit(1); // throw InvalidNode(m_invalidKey);
+  }
   push_back(Node(rhs));
 }
 
