@@ -13,9 +13,8 @@ include(CMakePackageConfigHelpers)
 include(CMakeDependentOption)
 include(CheckCXXCompilerFlag)
 include(GNUInstallDirs)
-include(CTest)
 
-find_program(YAML_CPP_CLANG_FORMAT_EXE NAMES clang-format)
+# find_program(YAML_CPP_CLANG_FORMAT_EXE NAMES clang-format)
 
 option(YAML_CPP_BUILD_CONTRIB "Enable yaml-cpp contrib in library" ON)
 option(YAML_CPP_BUILD_TOOLS "Enable parse tools" ON)
@@ -158,6 +157,7 @@ if (YAML_CPP_INSTALL)
 endif()
 
 if(YAML_CPP_BUILD_TESTS)
+  include(CTest)
 	add_subdirectory(test)
 endif()
 
